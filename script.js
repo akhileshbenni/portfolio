@@ -239,4 +239,73 @@ document.addEventListener('DOMContentLoaded', () => {
     revealElements.forEach(el => {
         revealObserver.observe(el);
     });
+
+    // ==========================================
+    // 9. AJAX CONTACT FORM EMAIL SUBMISSION
+    // ==========================================
+    const contactForm = document.getElementById('contactForm');
+    const formSubmitBtn = document.getElementById('formSubmitBtn');
+
+    if (contactForm && formSubmitBtn) {
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            // Form inputs
+            const nameVal = document.getElementById('form-name').value;
+            const emailVal = document.getElementById('form-email').value;
+            const messageVal = document.getElementById('form-message').value;
+
+            // Change button state to sending
+            const originalBtnContent = formSubmitBtn.innerHTML;
+            formSubmitBtn.disabled = true;
+            formSubmitBtn.innerHTML = 'Sending... <i class="fa-solid fa-circle-notch fa-spin"></i>';
+
+            // Send via FormSubmit AJAX
+            fetch("https://formsubmit.co/ajax/akhileshbenni@gmail.com", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify({
+                    name: nameVal,
+                    email: emailVal,
+                    message: messageVal
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Form submission failed.');
+            })
+            .then(data => {
+                // Success state animation
+                formSubmitBtn.innerHTML = 'Message Sent! <i class="fa-solid fa-circle-check"></i>';
+                formSubmitBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                contactForm.reset();
+
+                // Alert the user about FormSubmit first-time activation
+                alert('Your message has been sent successfully!\n\nNote: If this is your first time using FormSubmit for akhileshbenni@gmail.com, you will receive a verification email from FormSubmit.co. Please click "Confirm Email" in that message to activate form delivery.');
+
+                // Reset button back to original state
+                setTimeout(() => {
+                    formSubmitBtn.disabled = false;
+                    formSubmitBtn.innerHTML = originalBtnContent;
+                    formSubmitBtn.style.background = '';
+                }, 4000);
+            })
+            .catch(error => {
+                console.error('Error submitting form:', error);
+                formSubmitBtn.innerHTML = 'Failed. Try Again <i class="fa-solid fa-circle-xmark"></i>';
+                formSubmitBtn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+                
+                setTimeout(() => {
+                    formSubmitBtn.disabled = false;
+                    formSubmitBtn.innerHTML = originalBtnContent;
+                    formSubmitBtn.style.background = '';
+                }, 4000);
+            });
+        });
+    }
 });
